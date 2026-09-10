@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Undangan Wisuda - M.Hasbu, S.Kom.</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Library Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #4338ca;
+      --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+      --gold: #f59e0b;
+      --gold-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      --dark-bg: #090d16;
+      --card-bg: rgba(255, 255, 255, 0.98);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, var(--dark-bg) 100%);
+      color: #334155;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px 16px 40px;
+      overflow-x: hidden;
+    }
+
+    /* COVER LAYAR DEPAN */
+    #coverScreen {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, #1e1b4b 0%, #030712 100%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      text-align: center;
+      color: #ffffff;
+      transition: opacity 0.8s ease, visibility 0.8s ease, transform 0.8s ease;
+    }
+
+    #coverScreen.hide {
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(1.08);
+      pointer-events: none;
+    }
+
+    .cover-badge {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      padding: 6px 18px;
+      border-radius: 999px;
+      margin-bottom: 20px;
+      background: rgba(245, 158, 11, 0.08);
+    }
+
+    .cover-title {
+      font-family: 'Cinzel', serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    .cover-subtitle {
+      font-size: 14px;
+      color: #94a3b8;
+      margin-bottom: 30px;
+    }
+
+    .cover-guest-card {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 18px;
+      padding: 18px 24px;
+      margin-bottom: 32px;
+      width: 100%;
+      max-width: 320px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    .cover-guest-card small {
+      font-size: 12px;
+      color: #94a3b8;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .cover-guest-card strong {
+      font-size: 20px;
+      color: #f8fafc;
+      font-weight: 700;
+    }
+
+    .btn-open {
+      background: var(--gold-gradient);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 14px 36px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(217, 119, 6, 0.45);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-open:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(217, 119, 6, 0.65);
+    }
+
+    /* KARTU UTAMA */
+    .container {
+      width: 100%;
+      max-width: 440px;
+      animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 32px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6);
+      text-align: center;
+      padding: 38px 24px;
+      position: relative;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #eef2ff;
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      padding: 6px 18px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+    }
+
+    .avatar-wrapper {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 22px;
+    }
+
+    .avatar-wrapper::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #4f46e5, #f59e0b, #4f46e5);
+      animation: spinGlow 4s linear infinite;
+      z-index: 1;
+    }
+
+    .avatar-img {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #ffffff;
+      background: #e2e8f0;
+      z-index: 2;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      font-weight: 700;
+      color: #d97706;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .title {
+      font-family: 'Cinzel', serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .graduate-name {
+      font-size: 19px;
+      font-weight: 800;
+      color: #4338ca;
+      margin-bottom: 20px;
+    }
+
+    .recipient-box {
+      background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+      border: 1.5px dashed #cbd5e1;
+      border-radius: 18px;
+      padding: 16px 14px;
+      margin-bottom: 22px;
+    }
+
+    .recipient-label {
+      font-size: 11px;
+      color: #64748b;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .recipient-name {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .countdown-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+
+    .countdown-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 10px 4px;
+    }
+
+    .countdown-number {
+      font-size: 18px;
+      font-weight: 800;
+      color: #1e1b4b;
+    }
+
+    .countdown-text {
+      font-size: 10px;
+      color: #64748b;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .details-card {
+      background: #f8fafc;
+      border-radius: 18px;
+      padding: 20px;
+      text-align: left;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #475569;
+      margin-bottom: 22px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .details-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .details-item:last-child { margin-bottom: 0; }
+    
+    .details-icon {
+      font-size: 18px;
+      margin-right: 12px;
+      min-width: 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      text-decoration: none;
+      padding: 14px;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 14px;
+      transition: all 0.25s ease;
+      box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35);
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--primary-gradient);
+      color: #ffffff;
+      margin-bottom: 12px;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(79, 70, 229, 0.45);
+    }
+
+    /* TOMBOL & KOTAK KADO DIGITAL */
+    .btn-gift {
+      background: #ffffff;
+      color: #d97706;
+      border: 1.5px solid #fde68a;
+      box-shadow: 0 4px 12px rgba(217, 119, 6, 0.1);
+    }
+    .btn-gift:hover {
+      background: #fefce8;
+      border-color: #f59e0b;
+      transform: translateY(-2px);
+    }
+
+    .gift-container {
+      display: none;
+      margin-top: 18px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 22px 18px;
+      text-align: center;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .gift-desc {
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .qr-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid #cbd5e1;
+      display: inline-block;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      margin-bottom: 16px;
+    }
+
+    .qr-img {
+      width: 190px;
+      height: 190px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .dana-info {
+      background: #eef2ff;
+      border: 1px dashed #818cf8;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .dana-label { font-size: 11px; color: #6366f1; font-weight: 600; text-transform: uppercase; }
+    .dana-number { font-size: 17px; font-weight: 800; color: #1e1b4b; margin: 4px 0 2px; }
+    .dana-name { font-size: 12px; color: #475569; }
+
+    .btn-copy-dana {
+      background: #111827;
+      color: #ffffff;
+      padding: 10px;
+      font-size: 12px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      font-weight: 600;
+    }
+    .btn-copy-dana:hover { background: #374151; }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      background: #10b981;
+      color: #ffffff;
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 999999;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes spinGlow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- COVER DEPAN -->
+  <div id="coverScreen">
+    <div class="cover-badge">Official Invitation</div>
+    <h1 class="cover-title">Wisuda</h1>
+    <p class="cover-subtitle">M.Hasbu, S.Kom.</p>
+
+    <div class="cover-guest-card">
+      <small>Kepada Yth. Bapak/Ibu/Saudara/i:</small>
+      <strong id="coverGuestName">Tamu Undangan</strong>
+    </div>
+
+    <button type="button" class="btn-open" onclick="bukaUndangan()">
+      🎓 Buka Undangan
+    </button>
+  </div>
+
+  <!-- KARTU UTAMA UNDANGAN -->
+  <div class="container">
+    <div class="card">
+      <span class="badge">Official Invitation</span>
+
+      <div class="avatar-wrapper">
+        <img 
+          src="Bintang.png" 
+          alt="Bintang Islamia, S.Kom." 
+          class="avatar-img"
+        />
+      </div>
+
+      <div class="subtitle">Perayaan Wisuda Sarjana</div>
+      <div class="graduate-name">M.Hasbu, S.Kom.</div>
+
+      <div class="recipient-box">
+        <div class="recipient-label">Turut Mengundang Kehadiran:</div>
+        <div class="recipient-name" id="guestName">Tamu Undangan</div>
+      </div>
+
+      <div class="countdown-container">
+        <div class="countdown-box">
+          <div class="countdown-number" id="days">0</div>
+          <div class="countdown-text">Hari</div>
+        </div>
+        <div class="countdown-box">
+          <div class="countdown-number" id="hours">0</div>
+          <div class="countdown-text">Jam</div>
+        </div>
+        <div class="countdown-box">
+          <div class="countdown-number" id="minutes">0</div>
+          <div class="countdown-text">Menit</div>
+        </div>
+        <div class="countdown-box">
+          <div class="countdown-number" id="seconds">0</div>
+          <div class="countdown-text">Detik</div>
+        </div>
+      </div>
+
+      <div class="details-card">
+        <div class="details-item">
+          <span class="details-icon">🎓</span>
+          <div><strong>Program Studi:</strong> Sistem Informasi</div>
+        </div>
+        <div class="details-item">
+          <span class="details-icon">🏛</span>
+          <div><strong>Kampus:</strong> Universitas Dharmas Indonesia</div>
+        </div>
+        <div class="details-item">
+          <span class="details-icon">🗓</span>
+          <div><strong>Hari/Tanggal:</strong> Sabtu, 12 September 2026</div>
+        </div>
+        <div class="details-item">
+          <span class="details-icon">⏰</span>
+          <div><strong>Waktu:</strong> 08.00 WIB - Selesai</div>
+        </div>
+        <div class="details-item">
+          <span class="details-icon">📍</span>
+          <div><strong>Lokasi:</strong> Audit Kampus Undhari</div>
+        </div>
+      </div>
+
+      <!-- Tombol Peta -->
+      <a href="https://maps.app.goo.gl/AfNGh2tSTewBWKz17" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+        📍 Buka Peta Google Maps
+      </a>
+
+      <!-- Tombol Buka Kado Digital -->
+      <button type="button" class="btn btn-gift" onclick="toggleGift()">
+        🎁 Kirim Kado / Amplop Digital
+      </button>
+
+      <!-- KOTAK QR DANA (MUNCUL JIKA TOMBOL DIKLIK) -->
+      <div id="giftBox" class="gift-container">
+        <p class="gift-desc">
+          Doa dan kehadiran Anda merupakan karunia terindah bagi kami. Namun jika ingin memberikan tanda kasih secara digital, dapat melalui QRIS / DANA berikut:
+        </p>
+
+        <!-- QR Code DANA -->
+        <div class="qr-card">
+          <img src="Dana.png" alt="QR DANA Yoga Okta Randa" class="qr-img" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=DANA-YOGA'" />
+        </div>
+
+        <!-- Detail Nomor DANA -->
+        <div class="dana-info">
+          <div class="dana-label">Akun DANA / E-Wallet</div>
+          <!-- GANTI NOMOR DANA DI BAWAH INI -->
+          <div class="dana-number" id="nomorDana">085314725796</div>
+          <div class="dana-name">a.n. M.Hasbu</div>
+        </div>
+
+        <button type="button" class="btn-copy-dana" onclick="salinNomorDana()">
+          📋 Salin Nomor DANA
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Nomor DANA berhasil disalin! 📋</div>
+
+  <script>
+    // 1. Ambil Nama Tamu dari Link (?to=Nama)
+    const urlParams = new URLSearchParams(window.location.search);
+    const guest = urlParams.get('to');
+    if (guest) {
+      const decodedGuest = decodeURIComponent(guest);
+      document.getElementById('guestName').innerText = decodedGuest;
+      document.getElementById('coverGuestName').innerText = decodedGuest;
+    }
+
+    // 2. Buka Undangan & Confetti
+    function bukaUndangan() {
+      document.getElementById('coverScreen').classList.add('hide');
+
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      }
+    }
+
+    // 3. Countdown
+    const targetDate = new Date('2026-09-12T08:00:00+07:00').getTime();
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = targetDate - now;
+
+      if (distance > 0) {
+        document.getElementById('days').innerText = Math.floor(distance / (1000 * 60 * 60 * 24));
+        document.getElementById('hours').innerText = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        document.getElementById('minutes').innerText = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        document.getElementById('seconds').innerText = Math.floor((distance % (1000 * 60)) / 1000);
+      }
+    }
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // 4. Buka / Tutup Kotak Kado Digital
+    function toggleGift() {
+      const giftBox = document.getElementById('giftBox');
+      if (giftBox.style.display === 'block') {
+        giftBox.style.display = 'none';
+      } else {
+        giftBox.style.display = 'block';
+        giftBox.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // 5. Salin Nomor DANA
+    function salinNomorDana() {
+      const nomor = document.getElementById('nomorDana').innerText;
+      navigator.clipboard.writeText(nomor).then(() => {
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+      });
+    }
+  </script>
+
+</body>
+</html>
