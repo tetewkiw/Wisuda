@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Generator Undangan - M.Hasbu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #090d16;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .panel {
+      background: #1e293b;
+      width: 100%;
+      max-width: 440px;
+      padding: 30px 24px;
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      border: 1px solid #334155;
+    }
+    h1 { font-size: 20px; margin-bottom: 8px; color: #f8fafc; }
+    p { font-size: 13px; color: #94a3b8; margin-bottom: 24px; line-height: 1.5; }
+    label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #cbd5e1; display: block; margin-bottom: 8px; }
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1.5px solid #475569;
+      background: #0f172a;
+      color: #fff;
+      font-size: 15px;
+      outline: none;
+      margin-bottom: 18px;
+    }
+    input:focus { border-color: #6366f1; }
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      text-decoration: none;
+    }
+    .btn-wa { background: #16a34a; color: white; }
+    .btn-wa:hover { background: #15803d; }
+    .btn-copy { background: #334155; color: white; }
+    .btn-copy:hover { background: #475569; }
+    .btn-test { background: transparent; border: 1px dashed #64748b; color: #94a3b8; margin-top: 10px; }
+    .btn-test:hover { color: white; border-color: white; }
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      background: #10b981;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <div class="panel">
+    <h1>✨ Panel Pembuat Link Undangan</h1>
+    <p>Halaman ini khusus kamu (Hasbu). Masukkan nama tamu untuk membuat tautan dan langsung mengirimkannya ke WhatsApp.</p>
+
+    <label>Nama Tamu / Penerima:</label>
+    <input type="text" id="inputNama" placeholder="Cth: Fitri Dewi / Pak Ahmad & Keluarga" autofocus />
+
+    <button class="btn btn-wa" onclick="kirimWhatsApp()">
+      💬 Kirim Undangan via WhatsApp
+    </button>
+    <button class="btn btn-copy" onclick="salinLink()">
+      🔗 Salin Link Undangan
+    </button>
+    <button class="btn btn-test" onclick="tesBuka()">
+      👁️ Coba Pratinjau (Buka Undangan)
+    </button>
+  </div>
+
+  <div id="toast" class="toast">Link berhasil disalin! 📋</div>
+
+  <script>
+    function getLink() {
+      const nama = document.getElementById('inputNama').value.trim();
+      if (!nama) {
+        alert("Silakan ketik nama tamu terlebih dahulu!");
+        return null;
+      }
+      // Otomatis mengarah ke index.html (link utama undangan)
+      const base = window.location.origin + window.location.pathname.replace('buat.html', '');
+      return {
+        nama: nama,
+        url: `${base}?to=${encodeURIComponent(nama)}`
+      };
+    }
+
+    function kirimWhatsApp() {
+      const data = getLink();
+      if (!data) return;
+
+      const pesan = `Kepada Yth. ${data.nama},\n\nTanpa mengurangi rasa hormat, kami bermaksud mengundang Anda untuk menghadiri perayaan Tasyakuran Wisuda saya:\n\n*Bintang Islami, S.Kom.*\nProgram Studi Sistem Informasi - Universitas Dharmas Indonesia\n\nUntuk detail acara lengkap, silakan buka tautan undangan berikut:\n${data.url}\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan hadir. Terima kasih!`;
+
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(pesan)}`, '_blank');
+    }
+
+    function salinLink() {
+      const data = getLink();
+      if (!data) return;
+
+      navigator.clipboard.writeText(data.url).then(() => {
+        const toast = document.getElementById('toast');
+        toast.innerText = `Link untuk ${data.nama} disalin! 📋`;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+      });
+    }
+
+    function tesBuka() {
+      const data = getLink();
+      if (!data) return;
+      window.open(data.url, '_blank');
+    }
+  </script>
+</body>
+</html>
